@@ -4,7 +4,11 @@ dotenv.config();
 import express, { NextFunction, Request, Response } from "express";
 const PORT = 8188;
 const app = express();
-
+import {
+  connectMongoDB,
+  connectPGSQl,
+  connectRedis,
+} from "./config/dbConnect.js";
 //middlewares
 import cors from "cors";
 import morgan from "morgan";
@@ -13,7 +17,11 @@ app.use(cors());
 app.use(morgan("dev"));
 
 app.use(express.json());
+//DB connect
 
+connectMongoDB();
+const postgresPool = connectPGSQl();
+const redisDB = connectRedis();
 //Server setup
 
 app.get("/", (req, res) => {
