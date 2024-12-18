@@ -15,6 +15,7 @@ connectMongoDB();
 const postgresPool = connectPGSQl();
 const redisDB = connectRedis();
 //Server setup
+console.log(process.env.JWT_ACCESS_SECRET);
 app.get("/", (req, res) => {
     res.json({
         status: "success",
