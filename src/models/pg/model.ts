@@ -25,10 +25,8 @@ const createUserTableFunction = async () => {
   try {
     await pool.query(createUserTable);
     console.log("User Table created successfully");
-    process.exit(0);
   } catch (error) {
     console.error("Error creating User Table ", error);
-    process.exit(1);
   }
 };
 interface ICreateUser {

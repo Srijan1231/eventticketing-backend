@@ -31,11 +31,9 @@ const createUserTableFunction = () => __awaiter(void 0, void 0, void 0, function
     try {
         yield pool.query(createUserTable);
         console.log("User Table created successfully");
-        process.exit(0);
     }
     catch (error) {
         console.error("Error creating User Table ", error);
-        process.exit(1);
     }
 });
 const createUser = (_a) => __awaiter(void 0, [_a], void 0, function* ({ name, email, password, type, address, }) {
@@ -48,7 +46,7 @@ const createUser = (_a) => __awaiter(void 0, [_a], void 0, function* ({ name, em
     const result = yield pool.query(query, values);
     return result.rows[0];
 });
-const findUserByEmail = (email) => __awaiter(void 0, void 0, void 0, function* () {
+const findUserByEmail = (_a) => __awaiter(void 0, [_a], void 0, function* ({ email }) {
     const query = `
     SELECT * FROM users
     WHERE email = $1
@@ -64,23 +62,25 @@ const findUserByID = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield pool.query(query, [id]);
     return result.rows[0];
 });
-const updateUser = (id_1, _a) => __awaiter(void 0, [id_1, _a], void 0, function* (id, { name, email, address, type, password, refreshToken, accessToken, }) {
+const updateUser = (id_1, _a) => __awaiter(void 0, [id_1, _a], void 0, function* (id, { name, email, address, type, password }) {
     const query = `
     UPDATE users
-    SET name = $1, email = $2, address=$3, type=$4,password=$5,refreshToken=$6,accessToken=$7,updated_at=CURRENT_TIMESTAMP
-    WHERE id = $8
+    SET name = $1, email = $2, address=$3, type=$4,password=$5,updated_at=CURRENT_TIMESTAMP
+    WHERE id = $6
     RETURNING *
     `;
-    const values = [
-        name,
-        email,
-        address,
-        type,
-        password,
-        refreshToken,
-        accessToken,
-        id,
-    ];
+    const values = [name, email, address, type, password, id];
+    const result = yield pool.query(query, values);
+    return result.rows[0];
+});
+const updateUserByEmailJWT = (email_1, _a) => __awaiter(void 0, [email_1, _a], void 0, function* (email, { refreshToken, accessToken }) {
+    const query = `
+    UPDATE users
+    SET refreshToken=$1,accessToken=$2,updated_at=CURRENT_TIMESTAMP
+    WHERE email = $3
+    RETURNING *
+    `;
+    const values = [refreshToken, accessToken, email];
     const result = yield pool.query(query, values);
     return result.rows[0];
 });
@@ -92,4 +92,4 @@ const deleteUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield pool.query(query, [id]);
     return result.rowCount;
 });
-export { createUser, findUserByEmail, findUserByID, updateUser, deleteUser, createUserTableFunction, };
+export { createUser, findUserByEmail, findUserByID, updateUser, deleteUser, updateUserByEmailJWT, createUserTableFunction, };

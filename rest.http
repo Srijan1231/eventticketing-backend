@@ -1,0 +1,13 @@
+@rootAPI = http://localhost:8188/event-ticketing/api/v1
+
+POST {{rootAPI}}/user/register
+Content-Type: application/json
+
+
+{
+    "name":"Srijan Dahal",
+    "email":"a@a.com",
+    "password":"kathmandu",
+    "type":"admin",
+    "address":"Burwood"
+}

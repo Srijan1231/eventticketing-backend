@@ -20,8 +20,12 @@ app.use(express.json());
 //DB connect
 
 connectMongoDB();
-const postgresPool = connectPGSQl();
-const redisDB = connectRedis();
+connectPGSQl();
+connectRedis();
+
+//API
+import userRouter from "./routers/users/userRouter.js";
+app.use("/event-ticketing/api/v1/user", userRouter);
 //Server setup
 
 app.get("/", (req, res) => {

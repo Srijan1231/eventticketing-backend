@@ -24,11 +24,13 @@ const connectMongoDB = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 const connectPGSQl = () => {
+    var _a;
     const pool = new Pool({
         connectionString: process.env.PG_DATABASE_URL,
-        ssl: {
-            rejectUnauthorized: false, // Adjust this based on your environment (set to true in production)
-        },
+        ssl: ((_a = process.env.PG_DATABASE_URL) === null || _a === void 0 ? void 0 : _a.startsWith("postgres://") // Only enable SSL in production
+        )
+            ? { rejectUnauthorized: false }
+            : false, // Disables SSL in development
     });
     pool.connect((err, client, release) => {
         if (err) {

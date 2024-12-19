@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
-const PORT = 8188;
+const PORT = 8100;
 const app = express();
 import { connectMongoDB, connectPGSQl, connectRedis, } from "./config/dbConnect.js";
 //middlewares
@@ -12,10 +12,12 @@ app.use(morgan("dev"));
 app.use(express.json());
 //DB connect
 connectMongoDB();
-const postgresPool = connectPGSQl();
-const redisDB = connectRedis();
+connectPGSQl();
+connectRedis();
+//API
+import userRouter from "./routers/users/userRouter.js";
+app.use("/event-ticketing/api/v1/user", userRouter);
 //Server setup
-console.log(process.env.JWT_ACCESS_SECRET);
 app.get("/", (req, res) => {
     res.json({
         status: "success",
