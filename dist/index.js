@@ -16,7 +16,10 @@ connectPGSQl();
 connectRedis();
 //API
 import userRouter from "./routers/users/userRouter.js";
-app.use("/event-ticketing/api/v1/user", userRouter);
+import eventRouter from "./routers/events/eventRouter.js";
+const eventAPI = "/event-ticketing/api/v1";
+app.use(`${eventAPI}/user`, userRouter);
+app.use(`${eventAPI}/event`, eventRouter);
 //Server setup
 app.get("/", (req, res) => {
     res.json({

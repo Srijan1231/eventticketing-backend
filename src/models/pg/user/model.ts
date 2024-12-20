@@ -1,4 +1,4 @@
-import { connectPGSQl } from "../../config/dbConnect.js";
+import { connectPGSQl } from "../../../config/dbConnect.js";
 
 const pool = connectPGSQl();
 
@@ -60,23 +60,30 @@ const createUser = async ({
     VALUES ($1,$2,$3,$4,$5)
     RETURNING *
     `;
-
   const values = [name, email, password, type || "User", address];
-  const result = await pool.query(query, values);
-  return result.rows[0];
+
+  try {
+    const result = await pool.query(query, values);
+    return result.rows[0];
+  } catch (error) {
+    console.log("Database error:", error);
+  }
 };
 interface IFindUserByEmail {
   email: string;
 }
 const findUserByEmail = async ({ email }: IFindUserByEmail) => {
-  console.log(email);
   const query = `
     SELECT * FROM users
     WHERE email = $1
     `;
-  const result = await pool.query(query, [email]);
+  try {
+    const result = await pool.query(query, [email]);
 
-  return result.rows[0];
+    return result.rows[0];
+  } catch (error) {
+    console.log("Database error:", error);
+  }
 };
 interface IFindUserByID {
   id: string;
@@ -86,8 +93,30 @@ const findUserByID = async (id: IFindUserByID) => {
     SELECT * FROM users
     WHERE id = $1
     `;
-  const result = await pool.query(query, [id]);
-  return result.rows[0];
+  try {
+    const result = await pool.query(query, [id]);
+    return result.rows[0];
+  } catch (error) {
+    console.log("Database error:", error);
+  }
+};
+
+const findOneUser = async (filter: Record<string, any>) => {
+  const keys = Object.keys(filter);
+  const values = Object.values(filter);
+
+  const conditions = keys
+    .map((key, index) => `${key} = $${index + 1}`)
+    .join(" AND ");
+
+  const query = ` SELECT * FROM users WHERE ${conditions} LIMIT 1`;
+
+  try {
+    const result = await pool.query(query, values);
+    return result.rows[0] || null;
+  } catch (error) {
+    console.log("Database query error:", error);
+  }
 };
 interface IUpdateUser {
   name?: string;
@@ -95,33 +124,13 @@ interface IUpdateUser {
   address?: string;
   type?: string;
   password?: string;
-}
-const updateUser = async (
-  id: string,
-  { name, email, address, type, password }: IUpdateUser
-) => {
-  const query = `
-    UPDATE users
-    SET name = $1, email = $2, address=$3, type=$4,password=$5,updated_at=CURRENT_TIMESTAMP
-    WHERE id = $6
-    RETURNING *
-    `;
-  const values = [name, email, address, type, password, id];
-  const result = await pool.query(query, values);
-  return result.rows[0];
-};
-interface IUpdateUserByEmailJWT {
-  name?: string;
-
-  address?: string;
-  type?: string;
-  password?: string;
   refreshToken?: string;
   accessToken?: string;
 }
-const updateUserByEmailJWT = async (
+
+const updateUserForEmailJWT = async (
   email: string,
-  { refreshToken, accessToken }: IUpdateUserByEmailJWT
+  { refreshToken, accessToken }: IUpdateUser
 ) => {
   const query = `
     UPDATE users
@@ -130,10 +139,14 @@ const updateUserByEmailJWT = async (
     RETURNING *
     `;
   const values = [refreshToken, accessToken, email];
-  const result = await pool.query(query, values);
-  return result.rows[0];
+  try {
+    const result = await pool.query(query, values);
+    return result.rows[0];
+  } catch (error) {
+    console.log("Database error:", error);
+  }
 };
-/* const updateUser = async (id: string, updates: IUpdateUser) => {
+const updateUserByID = async (id: string, updates: IUpdateUser) => {
   // Filter keys to exclude undefined fields
   const keys = Object.keys(updates).filter(
     (key) => updates[key as keyof IUpdateUser] !== undefined
@@ -158,25 +171,30 @@ const updateUserByEmailJWT = async (
 
   const result = await pool.query(query, values);
   return result.rows[0];
-}; */
+};
 interface IDeleteUser {
   id: string;
 }
-const deleteUser = async (id: IDeleteUser) => {
+const deleteUserByID = async (id: IDeleteUser) => {
   const query = `
       DELETE FROM users
       WHERE id = $1;
     `;
-  const result = await pool.query(query, [id]);
-  return result.rowCount;
+  try {
+    const result = await pool.query(query, [id]);
+    return result.rows[0];
+  } catch (error) {
+    console.log("Database error:", error);
+  }
 };
 
 export {
   createUser,
   findUserByEmail,
   findUserByID,
-  updateUser,
-  deleteUser,
-  updateUserByEmailJWT,
+  deleteUserByID,
+  updateUserForEmailJWT,
   createUserTableFunction,
+  findOneUser,
+  updateUserByID,
 };

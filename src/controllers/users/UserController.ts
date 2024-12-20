@@ -2,8 +2,10 @@ import { Request, Response, NextFunction } from "express";
 import {
   createUser,
   createUserTableFunction,
+  deleteUserByID,
   findUserByEmail,
-} from "../../models/pg/model.js";
+  updateUserByID,
+} from "../../models/pg/user/model.js";
 
 import { comparePassword, hashPassword } from "../../utils/bcrypt.js";
 import { createAccessToken, createRefreshToken } from "../../utils/jwt.js";
@@ -81,6 +83,67 @@ export const getUser = (req: Request, res: Response, next: NextFunction) => {
       message: "Here is the requested user",
       user: req.userInfo,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const logOut = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { refreshToken, id } = req.body;
+    if (refreshToken && id) {
+      await updateUserByID(id, { refreshToken: "" });
+    }
+    res.json({
+      status: "success",
+      message: "Logged out",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+export const updateUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id, ...rest } = req.body;
+    const result = await updateUserByID(id, { ...rest });
+    result?.id
+      ? res.json({
+          status: "success",
+          message: "The user  has been updated successfully",
+        })
+      : res.json({
+          status: "error",
+          message: "Unable to update user, try again later",
+        });
+  } catch (error) {
+    next(error);
+  }
+};
+export const deleteUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.body;
+    const result = await deleteUserByID(id);
+    result?.id
+      ? res.json({
+          status: "success",
+          message: "User has been deleted",
+        })
+      : res.json({
+          status: "error",
+          message: "Error deleting user",
+        });
   } catch (error) {
     next(error);
   }

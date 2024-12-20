@@ -1,4 +1,4 @@
-import { ICreateUser } from "./src/models/pg/model.js";
+import { ICreateUser } from "./src/models/pg/user/model.js";
 
 declare global {
   namespace Express {

@@ -19,9 +19,9 @@ const connectMongoDB = async (): Promise<void> => {
 const connectPGSQl = (): pkg.Pool => {
   const pool = new Pool({
     connectionString: process.env.PG_DATABASE_URL,
-    ssl: process.env.PG_DATABASE_URL?.startsWith("postgres://") // Only enable SSL in production
-      ? { rejectUnauthorized: false }
-      : false, // Disables SSL in development
+    ssl: {
+      rejectUnauthorized: false, // Adjust this based on your environment (set to true in production)
+    },
   });
 
   pool.connect((err, client, release) => {
