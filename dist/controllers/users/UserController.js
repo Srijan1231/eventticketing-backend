@@ -7,8 +7,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { createUser, createUserTableFunction } from "../../models/pg/model.js";
-import { hashPassword } from "../../utils/bcrypt.js";
+import { createUser, createUserTableFunction, findUserByEmail, } from "../../models/pg/model.js";
+import { comparePassword, hashPassword } from "../../utils/bcrypt.js";
+import { createAccessToken, createRefreshToken } from "../../utils/jwt.js";
 export const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield createUserTableFunction();
@@ -36,3 +37,40 @@ export const register = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
         next(error);
     }
 });
+export const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email, password } = req.body;
+        const user = yield findUserByEmail({ email });
+        if (user === null || user === void 0 ? void 0 : user.id) {
+            const isMatched = comparePassword(password, user.password);
+            if (isMatched) {
+                const accessToken = yield createAccessToken(email);
+                const refreshToken = yield createRefreshToken(email);
+                return res.json({
+                    status: "success",
+                    message: "Login successful",
+                    token: { accessToken, refreshToken },
+                });
+            }
+        }
+        return res.json({
+            status: "Error",
+            message: "Invalid login details",
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+export const getUser = (req, res, next) => {
+    try {
+        return res.json({
+            status: "Success",
+            message: "Here is the requested user",
+            user: req.userInfo,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};

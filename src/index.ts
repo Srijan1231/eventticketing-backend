@@ -26,6 +26,7 @@ connectRedis();
 //API
 import userRouter from "./routers/users/userRouter.js";
 app.use("/event-ticketing/api/v1/user", userRouter);
+
 //Server setup
 
 app.get("/", (req, res) => {

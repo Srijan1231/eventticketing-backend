@@ -28,9 +28,20 @@ const createUserTable = `
 
 `;
 const createUserTableFunction = () => __awaiter(void 0, void 0, void 0, function* () {
+    const checkTableExistence = `
+    SELECT EXISTS (
+      SELECT FROM information_schema.tables 
+      WHERE table_name = 'users'
+    );
+  `;
     try {
-        yield pool.query(createUserTable);
-        console.log("User Table created successfully");
+        const result = yield pool.query(checkTableExistence);
+        const tableExists = result.rows[0].exists;
+        if (!tableExists) {
+            yield pool.query(createUserTable);
+            console.log("User Table created successfully");
+        }
+        console.log("User table exists already in DB");
     }
     catch (error) {
         console.error("Error creating User Table ", error);
@@ -47,6 +58,7 @@ const createUser = (_a) => __awaiter(void 0, [_a], void 0, function* ({ name, em
     return result.rows[0];
 });
 const findUserByEmail = (_a) => __awaiter(void 0, [_a], void 0, function* ({ email }) {
+    console.log(email);
     const query = `
     SELECT * FROM users
     WHERE email = $1

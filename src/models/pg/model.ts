@@ -22,14 +22,26 @@ const createUserTable = `
 `;
 
 const createUserTableFunction = async () => {
+  const checkTableExistence = `
+    SELECT EXISTS (
+      SELECT FROM information_schema.tables 
+      WHERE table_name = 'users'
+    );
+  `;
+
   try {
-    await pool.query(createUserTable);
-    console.log("User Table created successfully");
+    const result = await pool.query(checkTableExistence);
+    const tableExists = result.rows[0].exists;
+    if (!tableExists) {
+      await pool.query(createUserTable);
+      console.log("User Table created successfully");
+    }
+    console.log("User table exists already in DB");
   } catch (error) {
     console.error("Error creating User Table ", error);
   }
 };
-interface ICreateUser {
+export interface ICreateUser {
   name: string;
   email: string;
   password: string;
@@ -57,11 +69,13 @@ interface IFindUserByEmail {
   email: string;
 }
 const findUserByEmail = async ({ email }: IFindUserByEmail) => {
+  console.log(email);
   const query = `
     SELECT * FROM users
     WHERE email = $1
     `;
   const result = await pool.query(query, [email]);
+
   return result.rows[0];
 };
 interface IFindUserByID {
