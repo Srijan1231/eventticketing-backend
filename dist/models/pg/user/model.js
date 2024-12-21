@@ -135,8 +135,13 @@ const updateUserByID = (id, updates) => __awaiter(void 0, void 0, void 0, functi
     RETURNING *;
   `;
     values.push(id); // Append the `id` to the values array
-    const result = yield pool.query(query, values);
-    return result.rows[0];
+    try {
+        const result = yield pool.query(query, values);
+        return result.rows[0];
+    }
+    catch (error) {
+        console.log("Error updating user:", error);
+    }
 });
 const deleteUserByID = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const query = `

@@ -169,13 +169,15 @@ const updateUserByID = async (id: string, updates: IUpdateUser) => {
 
   values.push(id); // Append the `id` to the values array
 
-  const result = await pool.query(query, values);
-  return result.rows[0];
+  try {
+    const result = await pool.query(query, values);
+    return result.rows[0];
+  } catch (error) {
+    console.log("Error updating user:", error);
+  }
 };
-interface IDeleteUser {
-  id: string;
-}
-const deleteUserByID = async (id: IDeleteUser) => {
+
+const deleteUserByID = async (id: string) => {
   const query = `
       DELETE FROM users
       WHERE id = $1;

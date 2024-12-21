@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS events (
  capacity INT NOT NULL,
  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
  CONSTRAINT unique_event UNIQUE (name, event_date, location) 
 
 );
@@ -122,7 +123,7 @@ const updateEventByID = (id, updates) => __awaiter(void 0, void 0, void 0, funct
         console.log("Error updating events:", error);
     }
 });
-const deleteEvent = (id) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteEventByID = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const query = `
         DELETE FROM events
         WHERE id = $1;
@@ -135,4 +136,4 @@ const deleteEvent = (id) => __awaiter(void 0, void 0, void 0, function* () {
         console.log("Error deleting events:", error);
     }
 });
-export { createEventTableFunction, createEvent, findEventByID, findEventByFilter, updateEventByID, deleteEvent, findAllEvent, };
+export { createEventTableFunction, createEvent, findEventByID, findEventByFilter, updateEventByID, deleteEventByID, findAllEvent, };

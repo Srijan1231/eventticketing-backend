@@ -120,7 +120,7 @@ export const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, 
 });
 export const deleteUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id } = req.body;
+        const { id } = req.params;
         const result = yield deleteUserByID(id);
         (result === null || result === void 0 ? void 0 : result.id)
             ? res.json({

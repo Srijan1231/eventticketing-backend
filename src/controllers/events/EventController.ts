@@ -2,8 +2,10 @@ import { Request, Response, NextFunction } from "express";
 import {
   createEvent,
   createEventTableFunction,
+  deleteEventByID,
   findAllEvent,
   findEventByID,
+  updateEventByID,
 } from "../../models/pg/events/model.js";
 
 const postEvent = async (req: Request, res: Response, next: NextFunction) => {
@@ -46,7 +48,48 @@ const getEvents = async (req: Request, res: Response, next: NextFunction) => {
       event,
     });
   } catch (error) {
-    console.log("Error fetching events:", error);
+    next(error);
   }
 };
-export { postEvent, getEvents };
+
+const updateEvents = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id, ...rest } = req.body;
+    const result = await updateEventByID(id, { ...rest });
+    result?.id
+      ? res.json({ status: "success", message: "Event update successfully" })
+      : res.json({
+          status: "error",
+          message: "Error updating events",
+        });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteEvents = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const result = await deleteEventByID(id);
+    return result?.id
+      ? res.json({
+          status: "success",
+          message: "Event deleted",
+        })
+      : res.json({
+          status: "error",
+          message: "Unable to delete event",
+        });
+  } catch (error) {
+    next(error);
+  }
+};
+export { postEvent, getEvents, updateEvents, deleteEvents };

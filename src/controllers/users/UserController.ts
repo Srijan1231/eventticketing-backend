@@ -133,7 +133,7 @@ export const deleteUser = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.body;
+    const { id } = req.params;
     const result = await deleteUserByID(id);
     result?.id
       ? res.json({

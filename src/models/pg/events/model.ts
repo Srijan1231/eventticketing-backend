@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS events (
  capacity INT NOT NULL,
  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
  CONSTRAINT unique_event UNIQUE (name, event_date, location) 
 
 );
@@ -107,11 +108,11 @@ const findEventByFilter = async (filter: Record<string, any>) => {
   }
 };
 interface IUpdateEvent {
-  name: string;
-  event_date: Date;
-  location: string;
-  capacity: number;
-  user_id: string;
+  name?: string;
+  event_date?: Date;
+  location?: string;
+  capacity?: number;
+  user_id?: string;
 }
 const updateEventByID = async (id: string, updates: IUpdateEvent) => {
   // Filter keys to exclude undefined fields
@@ -139,10 +140,8 @@ const updateEventByID = async (id: string, updates: IUpdateEvent) => {
     console.log("Error updating events:", error);
   }
 };
-interface IDeleteEvent {
-  id: string;
-}
-const deleteEvent = async (id: IDeleteEvent) => {
+
+const deleteEventByID = async (id: string) => {
   const query = `
         DELETE FROM events
         WHERE id = $1;
@@ -160,6 +159,6 @@ export {
   findEventByID,
   findEventByFilter,
   updateEventByID,
-  deleteEvent,
+  deleteEventByID,
   findAllEvent,
 };
