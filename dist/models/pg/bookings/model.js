@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { connectPGSQl } from "../../../config/dbConnect";
+import { connectPGSQl } from "../../../config/dbConnect.js";
 const pool = connectPGSQl();
 const createBookingTable = `
 
@@ -98,7 +98,7 @@ const updateBookingByID = (id, updates) => __awaiter(void 0, void 0, void 0, fun
         console.log("Error updating booking:", error);
     }
 });
-const deletingBookingByID = (id) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteBookingByID = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const query = `DELETE FROM users
     WHERE id = $1;
     `;
@@ -110,4 +110,4 @@ const deletingBookingByID = (id) => __awaiter(void 0, void 0, void 0, function* 
         console.log("Error deleting booking:", error);
     }
 });
-export { createBookingTableFunction, createBooking, findBooking, updateBookingByID, deletingBookingByID, };
+export { createBookingTableFunction, createBooking, findBooking, updateBookingByID, deleteBookingByID, };

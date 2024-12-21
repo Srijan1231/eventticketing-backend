@@ -47,7 +47,6 @@ const postEvent = (req, res, next) => __awaiter(void 0, void 0, void 0, function
 const getEvents = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        console.log(id);
         const event = id ? yield findEventByID(id) : yield findAllEvent();
         return res.json({
             status: "success",

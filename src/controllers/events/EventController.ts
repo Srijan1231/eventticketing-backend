@@ -38,7 +38,6 @@ const postEvent = async (req: Request, res: Response, next: NextFunction) => {
 const getEvents = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
-    console.log(id);
 
     const event = id ? await findEventByID(id) : await findAllEvent();
 

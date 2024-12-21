@@ -1,4 +1,4 @@
-import { connectPGSQl } from "../../../config/dbConnect";
+import { connectPGSQl } from "../../../config/dbConnect.js";
 
 const pool = connectPGSQl();
 
@@ -120,7 +120,7 @@ const updateBookingByID = async (id: string, updates: IUpdateBooking) => {
   }
 };
 
-const deletingBookingByID = async (id: string) => {
+const deleteBookingByID = async (id: string) => {
   const query = `DELETE FROM users
     WHERE id = $1;
     `;
@@ -136,5 +136,5 @@ export {
   createBooking,
   findBooking,
   updateBookingByID,
-  deletingBookingByID,
+  deleteBookingByID,
 };

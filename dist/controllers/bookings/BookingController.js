@@ -7,7 +7,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { createBooking, createBookingTableFunction, } from "../../models/pg/bookings/model";
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
+import { createBooking, createBookingTableFunction, deleteBookingByID, findBooking, updateBookingByID, } from "../../models/pg/bookings/model.js";
 const postBooking = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield createBookingTableFunction();
@@ -26,4 +37,66 @@ const postBooking = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         next(error);
     }
 });
-export { postBooking };
+const getBooking = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const filter = req.query;
+        if (!filter || Object.keys(filter).length === 0) {
+            return res.json({
+                status: "error",
+                message: "Error filter cannot be empty",
+            });
+        }
+        const bookings = yield findBooking(filter);
+        if (bookings.length === 0) {
+            return res.json({
+                status: "success",
+                message: "No bookings found.",
+            });
+        }
+        res.json({
+            status: "success",
+            message: "Here is the list of bookings",
+            bookings,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+const updateBooking = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const _a = req.body, { id } = _a, rest = __rest(_a, ["id"]);
+        const booking = yield updateBookingByID(id, Object.assign({}, rest));
+        (booking === null || booking === void 0 ? void 0 : booking.id)
+            ? res.json({
+                status: "success",
+                message: "Booking details updated successfully",
+            })
+            : res.json({
+                status: "error",
+                message: "Error updating booking",
+            });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+const deleteBooking = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const booking = yield deleteBookingByID(id);
+        (booking === null || booking === void 0 ? void 0 : booking.id)
+            ? res.json({
+                status: "success",
+                message: "Booking details deleted",
+            })
+            : res.json({
+                status: "error",
+                message: "Error deleting booking details",
+            });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+export { postBooking, getBooking, updateBooking, deleteBooking };

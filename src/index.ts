@@ -26,9 +26,12 @@ connectRedis();
 //API
 import userRouter from "./routers/users/userRouter.js";
 import eventRouter from "./routers/events/eventRouter.js";
+import bookingRouter from "./routers/bookings/bookingRouter.js";
+import { auth } from "./middlewares/authMiddleware.js";
 const eventAPI = "/event-ticketing/api/v1";
 app.use(`${eventAPI}/user`, userRouter);
-app.use(`${eventAPI}/event`, eventRouter);
+app.use(`${eventAPI}/event`, auth, eventRouter);
+app.use(`${eventAPI}/booking`, auth, bookingRouter);
 
 //Server setup
 

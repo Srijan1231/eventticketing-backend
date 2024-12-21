@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import dotenv from "dotenv";
 import pkg from "pg";
 const { Pool } = pkg;
+let pool = null;
 import Redis from "ioredis";
 import mongoose from "mongoose";
 dotenv.config();
@@ -23,23 +24,47 @@ const connectMongoDB = () => __awaiter(void 0, void 0, void 0, function* () {
         process.exit(1);
     }
 });
+// const connectPGSQl = (): pkg.Pool => {
+//   const pool = new Pool({
+//     connectionString: process.env.PG_DATABASE_URL,
+//     ssl: {
+//       rejectUnauthorized: false, // Adjust this based on your environment (set to true in production)
+//     },
+//   });
+//   pool.connect((err, client, release) => {
+//     if (err) {
+//       console.error("PostgreSQL connection failed:", err.message);
+//       process.exit(1);
+//     } else {
+//       console.log("PostgreSQL Connected");
+//       release();
+//     }
+//   });
+//   return pool;
+// };
 const connectPGSQl = () => {
-    const pool = new Pool({
-        connectionString: process.env.PG_DATABASE_URL,
-        ssl: {
-            rejectUnauthorized: false, // Adjust this based on your environment (set to true in production)
-        },
-    });
-    pool.connect((err, client, release) => {
-        if (err) {
-            console.error("PostgreSQL connection failed:", err.message);
-            process.exit(1);
-        }
-        else {
-            console.log("PostgreSQL Connected");
-            release();
-        }
-    });
+    if (!pool) {
+        pool = new Pool({
+            connectionString: process.env.PG_DATABASE_URL,
+            ssl: {
+                rejectUnauthorized: false, // Adjust this based on your environment
+            },
+        });
+        pool.connect((err, client, release) => {
+            if (err) {
+                console.error("PostgreSQL initial connection failed:", err.message);
+                process.exit(1); // Exit if the initial connection fails
+            }
+            else {
+                console.log("PostgreSQL Connected ");
+                release(); // Release the client back to the pool
+            }
+        });
+        pool.on("error", (err) => {
+            console.error("Unexpected PostgreSQL error:", err.message);
+            process.exit(1); // Exit the process on critical errors
+        });
+    }
     return pool;
 };
 const connectRedis = () => {
