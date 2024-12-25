@@ -9,7 +9,8 @@ import {
 
 import { comparePassword, hashPassword } from "../../utils/bcrypt.js";
 import { createAccessToken, createRefreshToken } from "../../utils/jwt.js";
-
+import UserMetaData from "../../models/mongodb/Schema/UserMetaData.js";
+// This is for core data
 export const register = async (
   req: Request,
   res: Response,
@@ -22,6 +23,17 @@ export const register = async (
     req.body.password = hashPassword(password);
     const result = await createUser(req.body);
     if (result?.id) {
+      const { metadata } = req.body;
+      if (metadata && typeof metadata === "object") {
+        try {
+          await UserMetaData.create({
+            userId: result.id,
+            metadata,
+          });
+        } catch (metaError) {
+          console.log("Error creating user metadata:", metaError);
+        }
+      }
       return res.json({
         status: "success",
         message: "User Created successfully",
@@ -112,17 +124,30 @@ export const updateUser = async (
   next: NextFunction
 ) => {
   try {
-    const { id, ...rest } = req.body;
+    const { id, newFields, ...rest } = req.body;
     const result = await updateUserByID(id, { ...rest });
-    result?.id
-      ? res.json({
-          status: "success",
-          message: "The user  has been updated successfully",
-        })
-      : res.json({
-          status: "error",
-          message: "Unable to update user, try again later",
-        });
+    if (result?.id) {
+      if (newFields && typeof newFields === "object") {
+        try {
+          const updatedMetadata = await UserMetaData.findOneAndUpdate(
+            { userId: result.id },
+            { $set: { ...newFields } }, // Add or update fields in metadata
+            { new: true, upsert: true }
+          );
+          console.log("Updated metadata from user:", updatedMetadata);
+        } catch (metaError) {
+          console.log("Error creating user metadata:", metaError);
+        }
+      }
+      return res.status(200).json({
+        status: "success",
+        message: "User successfully updated",
+      });
+    }
+    return res.status(500).json({
+      status: "error",
+      message: "Error updating user",
+    });
   } catch (error) {
     next(error);
   }
@@ -135,16 +160,29 @@ export const deleteUser = async (
   try {
     const { id } = req.params;
     const result = await deleteUserByID(id);
-    result?.id
-      ? res.json({
-          status: "success",
-          message: "User has been deleted",
-        })
-      : res.json({
-          status: "error",
-          message: "Error deleting user",
+    if (result?.id) {
+      try {
+        const deleteUserMetaData = await UserMetaData.findOneAndDelete({
+          userId: result.id,
         });
+
+        console.log("User metadata deleted:", deleteUserMetaData);
+      } catch (metaError) {
+        console.log("Error creating user metadata:", metaError);
+      }
+
+      return res.json({
+        status: "success",
+        message: "User has been deleted",
+      });
+    }
+
+    return res.json({
+      status: "error",
+      message: "Error deleting user",
+    });
   } catch (error) {
     next(error);
   }
 };
+// This is for  metadata

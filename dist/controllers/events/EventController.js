@@ -19,11 +19,26 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 import { createEvent, createEventTableFunction, deleteEventByID, findAllEvent, findEventByID, updateEventByID, } from "../../models/pg/events/model.js";
+import EventMetaData from "../../models/mongodb/Schema/EventMetaData.js";
+// This is for core data
 const postEvent = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield createEventTableFunction();
         const result = yield createEvent(req.body);
-        if (result === null || result === void 0 ? void 0 : result.id) {
+        console.log(result);
+        if (result.id) {
+            const { metadata } = req.body;
+            if (metadata && typeof metadata === "object") {
+                try {
+                    yield EventMetaData.create({
+                        eventId: result.id,
+                        metadata,
+                    });
+                }
+                catch (metaError) {
+                    console.log("Error creating event metadata:", metaError);
+                }
+            }
             return res.json({
                 status: "success",
                 message: "Event created",
@@ -60,14 +75,20 @@ const getEvents = (req, res, next) => __awaiter(void 0, void 0, void 0, function
 });
 const updateEvents = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const _a = req.body, { id } = _a, rest = __rest(_a, ["id"]);
+        const _a = req.body, { id, newFields } = _a, rest = __rest(_a, ["id", "newFields"]);
         const result = yield updateEventByID(id, Object.assign({}, rest));
-        (result === null || result === void 0 ? void 0 : result.id)
-            ? res.json({ status: "success", message: "Event update successfully" })
-            : res.json({
-                status: "error",
-                message: "Error updating events",
+        if (result === null || result === void 0 ? void 0 : result.id) {
+            const updatedMetaEvent = yield EventMetaData.findOneAndUpdate({ eventId: result.id }, { $set: Object.assign({}, newFields) }, { new: true, upsert: true });
+            console.log("Event metadata updated:", updatedMetaEvent);
+            return res.status(200).json({
+                status: "success",
+                message: "Event update successfully",
             });
+        }
+        return res.status(500).json({
+            status: "error",
+            message: "Error updating events",
+        });
     }
     catch (error) {
         next(error);
@@ -77,18 +98,24 @@ const deleteEvents = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     try {
         const { id } = req.params;
         const result = yield deleteEventByID(id);
-        return (result === null || result === void 0 ? void 0 : result.id)
-            ? res.json({
+        if (result === null || result === void 0 ? void 0 : result.id) {
+            const deleteEventMetaData = yield EventMetaData.findOneAndDelete({
+                eventId: result.id,
+            });
+            console.log("Event metadata deleted:", deleteEventMetaData);
+            return res.json({
                 status: "success",
                 message: "Event deleted",
-            })
-            : res.json({
-                status: "error",
-                message: "Unable to delete event",
             });
+        }
+        return res.json({
+            status: "error",
+            message: "Unable to delete event",
+        });
     }
     catch (error) {
         next(error);
     }
 });
+// This is for  metadata
 export { postEvent, getEvents, updateEvents, deleteEvents };

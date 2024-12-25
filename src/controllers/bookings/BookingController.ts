@@ -6,20 +6,34 @@ import {
   findBooking,
   updateBookingByID,
 } from "../../models/pg/bookings/model.js";
-
+import BookingMetaData from "../../models/mongodb/Schema/BookingMetaData.js";
+//This is core controller
 const postBooking = async (req: Request, res: Response, next: NextFunction) => {
   try {
     await createBookingTableFunction();
     const result = await createBooking(req.body);
-    result?.id
-      ? res.json({
-          status: "success",
-          message: "Booked",
-        })
-      : res.json({
-          status: "error",
-          message: "Error booking",
-        });
+    if (result?.id) {
+      const { metadata } = req.body;
+      if (metadata && typeof metadata === "object") {
+        try {
+          await BookingMetaData.create({
+            bookingId: result.id,
+            metadata,
+          });
+        } catch (metaError) {
+          console.log("Error creating booking metadata:", metaError);
+        }
+      }
+      return res.json({
+        status: "success",
+        message: "Booked",
+      });
+    }
+
+    return res.json({
+      status: "error",
+      message: "Error booking",
+    });
   } catch (error) {
     next(error);
   }
@@ -59,17 +73,28 @@ const updateBooking = async (
   next: NextFunction
 ) => {
   try {
-    const { id, ...rest } = req.body;
+    const { id, newFields, ...rest } = req.body;
     const booking = await updateBookingByID(id, { ...rest });
-    booking?.id
-      ? res.json({
-          status: "success",
-          message: "Booking details updated successfully",
-        })
-      : res.json({
-          status: "error",
-          message: "Error updating booking",
-        });
+    if (booking?.id) {
+      if (newFields && newFields === "object") {
+        const updatedBookingMetaData = await BookingMetaData.findOneAndUpdate(
+          { bookingId: booking.id },
+          { $set: { ...newFields } },
+          { new: true, upsert: true }
+        );
+        console.log("Booking metadata updated:", updatedBookingMetaData);
+      }
+
+      return res.json({
+        status: "success",
+        message: "Booking details updated successfully",
+      });
+    }
+
+    return res.json({
+      status: "error",
+      message: "Error updating booking",
+    });
   } catch (error) {
     next(error);
   }
@@ -82,17 +107,25 @@ const deleteBooking = async (
   try {
     const { id } = req.params;
     const booking = await deleteBookingByID(id);
-    booking?.id
-      ? res.json({
-          status: "success",
-          message: "Booking details deleted",
-        })
-      : res.json({
-          status: "error",
-          message: "Error deleting booking details",
-        });
+    if (booking?.id) {
+      const deleteBookingMetaData = await BookingMetaData.findOneAndDelete({
+        bookingId: booking.id,
+      });
+      console.log("Booking metadata deleted:", deleteBookingMetaData);
+      return res.json({
+        status: "success",
+        message: "Booking details deleted",
+      });
+    }
+
+    return res.json({
+      status: "error",
+      message: "Error deleting booking details",
+    });
   } catch (error) {
     next(error);
   }
 };
+// This is for metaData
+
 export { postBooking, getBooking, updateBooking, deleteBooking };

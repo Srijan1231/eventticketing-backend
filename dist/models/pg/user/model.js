@@ -21,7 +21,6 @@ const createUserTable = `
   address VARCHAR(255) NOT NULL,
   password VARCHAR(255) NOT NULL,
   refreshToken VARCHAR(255),
-  accessToken VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -103,14 +102,14 @@ const findOneUser = (filter) => __awaiter(void 0, void 0, void 0, function* () {
         console.log("Database query error:", error);
     }
 });
-const updateUserForEmailJWT = (email_1, _a) => __awaiter(void 0, [email_1, _a], void 0, function* (email, { refreshToken, accessToken }) {
+const updateUserForEmailJWT = (email_1, _a) => __awaiter(void 0, [email_1, _a], void 0, function* (email, { refreshToken }) {
     const query = `
     UPDATE users
-    SET refreshToken=$1,accessToken=$2,updated_at=CURRENT_TIMESTAMP
-    WHERE email = $3
+    SET refreshToken=$1,updated_at=CURRENT_TIMESTAMP
+    WHERE email = $2
     RETURNING *
     `;
-    const values = [refreshToken, accessToken, email];
+    const values = [refreshToken, email];
     try {
         const result = yield pool.query(query, values);
         return result.rows[0];

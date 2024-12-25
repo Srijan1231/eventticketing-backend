@@ -19,19 +19,34 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 import { createBooking, createBookingTableFunction, deleteBookingByID, findBooking, updateBookingByID, } from "../../models/pg/bookings/model.js";
+import BookingMetaData from "../../models/mongodb/Schema/BookingMetaData.js";
+//This is core controller
 const postBooking = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield createBookingTableFunction();
         const result = yield createBooking(req.body);
-        (result === null || result === void 0 ? void 0 : result.id)
-            ? res.json({
+        if (result === null || result === void 0 ? void 0 : result.id) {
+            const { metadata } = req.body;
+            if (metadata && typeof metadata === "object") {
+                try {
+                    yield BookingMetaData.create({
+                        bookingId: result.id,
+                        metadata,
+                    });
+                }
+                catch (metaError) {
+                    console.log("Error creating booking metadata:", metaError);
+                }
+            }
+            return res.json({
                 status: "success",
                 message: "Booked",
-            })
-            : res.json({
-                status: "error",
-                message: "Error booking",
             });
+        }
+        return res.json({
+            status: "error",
+            message: "Error booking",
+        });
     }
     catch (error) {
         next(error);
@@ -65,17 +80,22 @@ const getBooking = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 });
 const updateBooking = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const _a = req.body, { id } = _a, rest = __rest(_a, ["id"]);
+        const _a = req.body, { id, newFields } = _a, rest = __rest(_a, ["id", "newFields"]);
         const booking = yield updateBookingByID(id, Object.assign({}, rest));
-        (booking === null || booking === void 0 ? void 0 : booking.id)
-            ? res.json({
+        if (booking === null || booking === void 0 ? void 0 : booking.id) {
+            if (newFields && newFields === "object") {
+                const updatedBookingMetaData = yield BookingMetaData.findOneAndUpdate({ bookingId: booking.id }, { $set: Object.assign({}, newFields) }, { new: true, upsert: true });
+                console.log("Booking metadata updated:", updatedBookingMetaData);
+            }
+            return res.json({
                 status: "success",
                 message: "Booking details updated successfully",
-            })
-            : res.json({
-                status: "error",
-                message: "Error updating booking",
             });
+        }
+        return res.json({
+            status: "error",
+            message: "Error updating booking",
+        });
     }
     catch (error) {
         next(error);
@@ -85,18 +105,24 @@ const deleteBooking = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     try {
         const { id } = req.params;
         const booking = yield deleteBookingByID(id);
-        (booking === null || booking === void 0 ? void 0 : booking.id)
-            ? res.json({
+        if (booking === null || booking === void 0 ? void 0 : booking.id) {
+            const deleteBookingMetaData = yield BookingMetaData.findOneAndDelete({
+                bookingId: booking.id,
+            });
+            console.log("Booking metadata deleted:", deleteBookingMetaData);
+            return res.json({
                 status: "success",
                 message: "Booking details deleted",
-            })
-            : res.json({
-                status: "error",
-                message: "Error deleting booking details",
             });
+        }
+        return res.json({
+            status: "error",
+            message: "Error deleting booking details",
+        });
     }
     catch (error) {
         next(error);
     }
 });
+// This is for metaData
 export { postBooking, getBooking, updateBooking, deleteBooking };

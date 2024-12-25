@@ -21,6 +21,8 @@ var __rest = (this && this.__rest) || function (s, e) {
 import { createUser, createUserTableFunction, deleteUserByID, findUserByEmail, updateUserByID, } from "../../models/pg/user/model.js";
 import { comparePassword, hashPassword } from "../../utils/bcrypt.js";
 import { createAccessToken, createRefreshToken } from "../../utils/jwt.js";
+import UserMetaData from "../../models/mongodb/Schema/UserMetaData.js";
+// This is for core data
 export const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield createUserTableFunction();
@@ -28,6 +30,18 @@ export const register = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
         req.body.password = hashPassword(password);
         const result = yield createUser(req.body);
         if (result === null || result === void 0 ? void 0 : result.id) {
+            const { metadata } = req.body;
+            if (metadata && typeof metadata === "object") {
+                try {
+                    yield UserMetaData.create({
+                        userId: result.id,
+                        metadata,
+                    });
+                }
+                catch (metaError) {
+                    console.log("Error creating user metadata:", metaError);
+                }
+            }
             return res.json({
                 status: "success",
                 message: "User Created successfully",
@@ -102,17 +116,28 @@ export const logOut = (req, res, next) => __awaiter(void 0, void 0, void 0, func
 });
 export const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const _a = req.body, { id } = _a, rest = __rest(_a, ["id"]);
+        const _a = req.body, { id, newFields } = _a, rest = __rest(_a, ["id", "newFields"]);
         const result = yield updateUserByID(id, Object.assign({}, rest));
-        (result === null || result === void 0 ? void 0 : result.id)
-            ? res.json({
+        if (result === null || result === void 0 ? void 0 : result.id) {
+            if (newFields && typeof newFields === "object") {
+                try {
+                    const updatedMetadata = yield UserMetaData.findOneAndUpdate({ userId: result.id }, { $set: Object.assign({}, newFields) }, // Add or update fields in metadata
+                    { new: true, upsert: true });
+                    console.log("Updated metadata from user:", updatedMetadata);
+                }
+                catch (metaError) {
+                    console.log("Error creating user metadata:", metaError);
+                }
+            }
+            return res.status(200).json({
                 status: "success",
-                message: "The user  has been updated successfully",
-            })
-            : res.json({
-                status: "error",
-                message: "Unable to update user, try again later",
+                message: "User successfully updated",
             });
+        }
+        return res.status(500).json({
+            status: "error",
+            message: "Error updating user",
+        });
     }
     catch (error) {
         next(error);
@@ -122,17 +147,28 @@ export const deleteUser = (req, res, next) => __awaiter(void 0, void 0, void 0, 
     try {
         const { id } = req.params;
         const result = yield deleteUserByID(id);
-        (result === null || result === void 0 ? void 0 : result.id)
-            ? res.json({
+        if (result === null || result === void 0 ? void 0 : result.id) {
+            try {
+                const deleteUserMetaData = yield UserMetaData.findOneAndDelete({
+                    userId: result.id,
+                });
+                console.log("User metadata deleted:", deleteUserMetaData);
+            }
+            catch (metaError) {
+                console.log("Error creating user metadata:", metaError);
+            }
+            return res.json({
                 status: "success",
                 message: "User has been deleted",
-            })
-            : res.json({
-                status: "error",
-                message: "Error deleting user",
             });
+        }
+        return res.json({
+            status: "error",
+            message: "Error deleting user",
+        });
     }
     catch (error) {
         next(error);
     }
 });
+// This is for  metadata

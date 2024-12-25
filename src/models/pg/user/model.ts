@@ -14,7 +14,6 @@ const createUserTable = `
   address VARCHAR(255) NOT NULL,
   password VARCHAR(255) NOT NULL,
   refreshToken VARCHAR(255),
-  accessToken VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -125,20 +124,19 @@ interface IUpdateUser {
   type?: string;
   password?: string;
   refreshToken?: string;
-  accessToken?: string;
 }
 
 const updateUserForEmailJWT = async (
   email: string,
-  { refreshToken, accessToken }: IUpdateUser
+  { refreshToken }: IUpdateUser
 ) => {
   const query = `
     UPDATE users
-    SET refreshToken=$1,accessToken=$2,updated_at=CURRENT_TIMESTAMP
-    WHERE email = $3
+    SET refreshToken=$1,updated_at=CURRENT_TIMESTAMP
+    WHERE email = $2
     RETURNING *
     `;
-  const values = [refreshToken, accessToken, email];
+  const values = [refreshToken, email];
   try {
     const result = await pool.query(query, values);
     return result.rows[0];
