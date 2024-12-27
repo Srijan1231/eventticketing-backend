@@ -27,6 +27,7 @@
     "@types/cors": "^2.8.17",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/morgan": "^1.9.9",
+    "@types/qrcode": "^1.5.5",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -35,7 +36,10 @@
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
+    "pdf-lib": "^1.17.1",
     "pg": "^8.13.1",
+    "puppeteer": "^23.11.1",
+    "qrcode": "^1.5.4",
     "stripe": "^17.5.0"
   }
 }
