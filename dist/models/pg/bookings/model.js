@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS bookings(
     total_ticket INT DEFAULT 1,
     status VARCHAR(50) DEFAULT 'pending',
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    CONSTRAINT unique_event UNIQUE (user_id, event_id) 
+    CONSTRAINT unique_booking UNIQUE (user_id, event_id) 
 
 );
 `;
