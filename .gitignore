@@ -3,4 +3,4 @@ node_modules
 /src/routers/payments
 /src/controllers/payments
 
-/src/models/pg/payments/model.ts
+/src/models/pg/payments

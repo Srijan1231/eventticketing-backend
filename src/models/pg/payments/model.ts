@@ -1,4 +1,3 @@
-import { QueryArrayConfig } from "pg";
 import { connectPGSQl } from "../../../config/dbConnect";
 
 const pool = connectPGSQl();
