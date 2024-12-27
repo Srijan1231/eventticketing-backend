@@ -19,7 +19,7 @@ This repository contains the backend code for a web application, built with Type
 1. Clone the repository:
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Srijan1231/eventticketing-backend.git
    ```
 
 2. Navigate to the project directory:
