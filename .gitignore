@@ -1,6 +1,2 @@
 node_modules
 .env
-/src/routers/payments
-/src/controllers/payments
-
-/src/models/pg/payments
