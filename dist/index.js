@@ -27,11 +27,13 @@ connectRedis();
 import userRouter from "./routers/users/userRouter.js";
 import eventRouter from "./routers/events/eventRouter.js";
 import bookingRouter from "./routers/bookings/bookingRouter.js";
+import ticketRouter from "./routers/ticketRouter.js";
 import { auth } from "./middlewares/authMiddleware.js";
 const eventAPI = "/event-ticketing/api/v1";
 app.use(`${eventAPI}/user`, userRouter);
 app.use(`${eventAPI}/event`, auth, eventRouter);
 app.use(`${eventAPI}/booking`, auth, bookingRouter);
+app.use(`${eventAPI}/ticket`, auth, ticketRouter);
 //Server setup
 app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.json({

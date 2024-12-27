@@ -2,8 +2,10 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import express, { NextFunction, Request, Response } from "express";
+
 const PORT = 8188;
 const app = express();
+
 import {
   connectMongoDB,
   connectPGSQl,
@@ -27,12 +29,14 @@ connectRedis();
 import userRouter from "./routers/users/userRouter.js";
 import eventRouter from "./routers/events/eventRouter.js";
 import bookingRouter from "./routers/bookings/bookingRouter.js";
+import ticketRouter from "./routers/ticketRouter.js";
 import { auth } from "./middlewares/authMiddleware.js";
 
 const eventAPI = "/event-ticketing/api/v1";
 app.use(`${eventAPI}/user`, userRouter);
 app.use(`${eventAPI}/event`, auth, eventRouter);
 app.use(`${eventAPI}/booking`, auth, bookingRouter);
+app.use(`${eventAPI}/ticket`, auth, ticketRouter);
 
 //Server setup
 
