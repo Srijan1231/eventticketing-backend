@@ -1,0 +1,400 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Event Ticketing API",
+    "version": "1.0.0",
+    "description": "API documentation for the Event Ticketing application."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:1200/event-ticketing/api/v1",
+      "description": "Local server"
+    }
+  ],
+  "paths": {
+    "/user/register": {
+      "post": {
+        "summary": "Register a new user",
+        "tags": ["User"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User created successfully"
+          },
+          "400": {
+            "description": "Invalid request"
+          }
+        }
+      }
+    },
+    "/user/login": {
+      "post": {
+        "summary": "User login",
+        "tags": ["User"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Login"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful"
+          },
+          "400": {
+            "description": "Invalid login details"
+          }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "summary": "Get user details",
+        "tags": ["User"],
+        "security": [{ "jwtAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "User details retrieved successfully"
+          }
+        }
+      }
+    },
+    "/user/update": {
+      "put": {
+        "summary": "Update user details",
+        "tags": ["User"],
+        "security": [{ "jwtAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully"
+          }
+        }
+      }
+    },
+    "/user/logout": {
+      "post": {
+        "summary": "Logout user",
+        "tags": ["User"],
+        "security": [{ "jwtAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Logout successful"
+          }
+        }
+      }
+    },
+    "/user/{id}": {
+      "delete": {
+        "summary": "Delete a user",
+        "tags": ["User"],
+        "security": [{ "jwtAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted successfully"
+          }
+        }
+      }
+    },
+    "/event/create": {
+      "post": {
+        "summary": "Create a new event",
+        "tags": ["Event"],
+        "security": [{ "jwtAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Event"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event created successfully"
+          },
+          "409": {
+            "description": "Duplicate event"
+          }
+        }
+      }
+    },
+    "/event/{id}": {
+      "get": {
+        "summary": "Get event details",
+        "tags": ["Event"],
+        "security": [{ "jwtAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Event details retrieved successfully"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an event",
+        "tags": ["Event"],
+        "security": [{ "jwtAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Event deleted successfully"
+          }
+        }
+      }
+    },
+    "/event/update": {
+      "put": {
+        "summary": "Update event details",
+        "tags": ["Event"],
+        "security": [{ "jwtAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event updated successfully"
+          }
+        }
+      }
+    },
+    "/booking/create": {
+      "post": {
+        "summary": "Create a new booking",
+        "tags": ["Booking"],
+        "security": [{ "jwtAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Booking"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Booking created successfully"
+          }
+        }
+      }
+    },
+    "/booking": {
+      "get": {
+        "summary": "Get bookings",
+        "tags": ["Booking"],
+        "security": [{ "jwtAuth": [] }],
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Bookings retrieved successfully"
+          }
+        }
+      }
+    },
+    "/booking/update": {
+      "put": {
+        "summary": "Update booking details",
+        "tags": ["Booking"],
+        "security": [{ "jwtAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Booking updated successfully"
+          }
+        }
+      }
+    },
+    "/booking/delete": {
+      "delete": {
+        "summary": "Delete a booking",
+        "tags": ["Booking"],
+        "security": [{ "jwtAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Booking deleted successfully"
+          }
+        }
+      }
+    },
+    "/ticket/generate": {
+      "post": {
+        "summary": "Generate a ticket",
+        "tags": ["Ticket"],
+        "security": [{ "jwtAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ticket"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ticket generated successfully",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "jwtAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "JWT Token used for authentication"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object"
+          }
+        }
+      },
+      "Login": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "UserUpdate": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "newFields": {
+            "type": "object"
+          }
+        }
+      },
+      "Event": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  }
+}

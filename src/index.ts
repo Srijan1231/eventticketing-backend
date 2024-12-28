@@ -2,10 +2,18 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import express, { NextFunction, Request, Response } from "express";
+import { readFileSync } from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const PORT = process.env.PORT || 8188;
 const app = express();
-
+import swaggerUi from "swagger-ui-express";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const swaggerDocument = JSON.parse(
+  readFileSync(path.resolve(__dirname, "../swagger.json"), "utf-8")
+);
 import {
   connectMongoDB,
   connectPGSQl,
@@ -37,15 +45,16 @@ app.use(`${eventAPI}/user`, userRouter);
 app.use(`${eventAPI}/event`, auth, eventRouter);
 app.use(`${eventAPI}/booking`, auth, bookingRouter);
 app.use(`${eventAPI}/ticket`, auth, ticketRouter);
-
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 //Server setup
 
-app.get("/", async (req, res) => {
+app.get("/", async (req: Request, res: Response) => {
   res.json({
     status: "success",
     message: "Server is up and running for event-ticketing backend",
   });
 });
+// console.log(swaggerDoc);
 interface IServer {
   statusCode: number;
   message: string;

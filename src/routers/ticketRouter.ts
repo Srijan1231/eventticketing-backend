@@ -10,8 +10,9 @@ const router = express.Router();
 
 const __filename =
   "/Users/srijandahal/private files/eventticketing/backend/src";
+
 const __dirname = path.dirname(__filename);
-console.log(__dirname);
+
 // API to generate the ticket as a PDF
 router.post("/generate", async (req, res) => {
   try {
