@@ -3,7 +3,7 @@ dotenv.config();
 
 import express, { NextFunction, Request, Response } from "express";
 
-const PORT = 8188;
+const PORT = process.env.PORT || 8188;
 const app = express();
 
 import {
@@ -59,7 +59,5 @@ app.use((error: IServer, req: Request, res: Response, next: NextFunction) => {
 });
 
 app.listen(PORT, (error?: Error) => {
-  error
-    ? console.log(error)
-    : console.log(`server is running at http://localhost:${PORT}`);
+  error ? console.log(error) : console.log(`server is running at :${PORT}`);
 });
