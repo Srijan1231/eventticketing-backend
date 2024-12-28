@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
-const PORT = 8188;
+const PORT = process.env.PORT || 8188;
 const app = express();
 import { connectMongoDB, connectPGSQl, connectRedis, } from "./config/dbConnect.js";
 //middlewares
@@ -49,7 +49,5 @@ app.use((error, req, res, next) => {
     });
 });
 app.listen(PORT, (error) => {
-    error
-        ? console.log(error)
-        : console.log(`server is running at http://localhost:${PORT}`);
+    error ? console.log(error) : console.log(`server is running at :${PORT}`);
 });

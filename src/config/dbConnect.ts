@@ -1,19 +1,18 @@
 import dotenv from "dotenv";
+dotenv.config();
 import pkg from "pg";
 const { Pool } = pkg;
 let pool: pkg.Pool | null = null;
 import Redis from "ioredis";
 import mongoose from "mongoose";
-
-dotenv.config();
-
+console.log(process.env.MONGO_URI);
 const connectMongoDB = async (): Promise<void> => {
   try {
     await mongoose.connect(process.env.MONGO_URI as string);
+
     console.log("MongoDB connected");
   } catch (error) {
     console.log("Error connecting MongoDB");
-    process.exit(1);
   }
 };
 // const connectPGSQl = (): pkg.Pool => {
