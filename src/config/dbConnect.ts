@@ -5,14 +5,14 @@ const { Pool } = pkg;
 let pool: pkg.Pool | null = null;
 import Redis from "ioredis";
 import mongoose from "mongoose";
-console.log(process.env.MONGO_URI);
+
 const connectMongoDB = async (): Promise<void> => {
   try {
     await mongoose.connect(process.env.MONGO_URI as string);
 
     console.log("MongoDB connected");
   } catch (error) {
-    console.log("Error connecting MongoDB");
+    console.log("Error connecting MongoDB", error);
   }
 };
 // const connectPGSQl = (): pkg.Pool => {
