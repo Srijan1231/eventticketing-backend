@@ -29,7 +29,7 @@ router.post("/generate", async (req, res) => {
     }
 
     // Generate the QR code with the ticket information
-    const qrCodeData = `Event: ${eventName}\nDate: ${date}\nName: ${userName}`;
+    const qrCodeData = `Event: ${eventName}\nDate: ${date}\nName: ${userName}\eventID: ${eventId}`;
     const qrCodeUrl = await QRCode.toDataURL(qrCodeData);
 
     // Create the HTML content

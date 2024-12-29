@@ -51,7 +51,9 @@ app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.get("/", async (req: Request, res: Response) => {
   res.json({
     status: "success",
-    message: "Server is up and running for event-ticketing backend",
+    message: `Server is up and running for event-ticketing backend. 
+      Checkout this link for documentation
+      https://eventticketing-backend.onrender.com/docs`,
   });
 });
 // console.log(swaggerDoc);
